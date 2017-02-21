@@ -19,9 +19,9 @@ class CsvTable(val file: File, protoRowType: Option[RelProtoDataType]) extends A
     }
     if (fieldTypes.isEmpty) {
       this.fieldTypes = Option(List.empty[CsvFieldType])
-      return CsvEnumerator.deduceRowType(typeFactory.asInstanceOf[JavaTypeFactory], file, fieldTypes)
+      CsvEnumerator.deduceRowType(typeFactory.asInstanceOf[JavaTypeFactory], file, fieldTypes)
     } else {
-      return CsvEnumerator.deduceRowType(typeFactory.asInstanceOf[JavaTypeFactory], file, None)
+      CsvEnumerator.deduceRowType(typeFactory.asInstanceOf[JavaTypeFactory], file, None)
     }
   }
 }
