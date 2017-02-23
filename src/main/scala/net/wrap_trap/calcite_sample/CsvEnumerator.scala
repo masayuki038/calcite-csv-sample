@@ -21,7 +21,6 @@ object CsvEnumerator {
   val TIME_FORMAT_TIME = FastDateFormat.getInstance("HH:mm:ss", gmt)
   val TIME_FORMAT_TIMESTAMP = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss", gmt)
 
-
   def deduceRowType(typeFactory: JavaTypeFactory, file: File, fieldTypes: Option[List[CsvFieldType]]): RelDataType = {
     var types = List.empty[RelDataType]
     var names = List.empty[String]
@@ -70,7 +69,15 @@ object CsvEnumerator {
     new CSVReader(reader)
   }
 
-  private def identityList(n: Int): Array[Int] = {
+  def converter(fieldTypes: Array[CsvFieldType], fields: Array[Int]): RowConverter[Any] = {
+    if (fields.length == 1) {
+      new SingleColumnRowConverter(fieldTypes(fields(0)), fields(0))
+    } else {
+      new ArrayRowConverter(fieldTypes, fields)
+    }
+  }
+
+  def identityList(n: Int): Array[Int] = {
     (0 to n).toArray
   }
 }
@@ -82,14 +89,6 @@ class CsvEnumerator[T](val file: File,
   var csvReader: CSVReader = CsvEnumerator.openCsv(file)
   var currentPos: Option[T] = None
   this.csvReader.readNext()
-
-  private def converter(fieldTypes: Array[CsvFieldType], fields: Array[Int]): RowConverter[Any] = {
-    if (fields.length == 1) {
-      new SingleColumnRowConverter(fieldTypes(fields(0)), fields(0))
-    } else {
-      new ArrayRowConverter(fieldTypes, fields)
-    }
-  }
 
   override def current(): T = {
     currentPos.get

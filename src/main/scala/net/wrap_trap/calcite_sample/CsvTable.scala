@@ -13,6 +13,8 @@ class CsvTable(val file: File, protoRowType: Option[RelProtoDataType]) extends A
 
   var fieldTypes: Option[List[CsvFieldType]] = None
 
+  def getFieldTypes(): Option[List[CsvFieldType]] = fieldTypes
+
   def getRowType(typeFactory: RelDataTypeFactory): RelDataType = {
     if (this.protoRowType.isDefined) {
       return this.protoRowType.get.apply(typeFactory)
