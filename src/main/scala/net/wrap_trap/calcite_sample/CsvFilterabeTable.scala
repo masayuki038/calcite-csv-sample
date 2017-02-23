@@ -19,13 +19,11 @@ class CsvFilterableTable(val tFile: File, val tProtoRowType: Option[RelProtoData
   }
 
   def scan(root: DataContext, filterCandidate: List[RexNode]): Enumerable[Array[Any]] = {
-    var selectedFilters = List.empty[(Int, RexLiteral)]
-
     val fields = CsvEnumerator.identityList(fieldTypes.size)
     val filterValues = new Array[String](fieldTypes.size)
 
-    filterCandidate.foreach(filter => isFilterApplicable(filter).foreach(f => selectedFilters = f :: selectedFilters))
-    selectedFilters.foreach(selectedFilter => filterValues(selectedFilter._1) = selectedFilter._2.getValue2.toString)
+    filterCandidate.foreach(
+      filter => isFilterApplicable(filter).foreach(f => filterValues(f._1) = f._2.getValue2.toString))
 
     val cancelFlag = DataContext.Variable.CANCEL_FLAG.get(root)
     new AbstractEnumerable[Array[Any]] {
