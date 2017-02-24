@@ -90,6 +90,10 @@ class CsvEnumerator[T](val file: File,
   var currentPos: Option[T] = None
   this.csvReader.readNext()
 
+  def this(file: File, cancelFlag: AtomicBoolean, fieldTypes: List[CsvFieldType], fields: Array[Int]) = {
+    this(file, cancelFlag, null, CsvEnumerator.converter(fieldTypes.toArray, fields))
+  }
+
   override def current(): T = {
     currentPos.get
   }
