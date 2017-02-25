@@ -10,7 +10,7 @@ import org.apache.calcite.rex.RexNode
 /**
   * Created by masayuki on 2017/02/21.
   */
-class CsvScannableTable(val tFile: File, val tProtoRowType: Option[RelProtoDataType])
+class CsvScannableTable(val tFile: File, val tProtoRowType: RelProtoDataType)
   extends CsvTable(tFile, tProtoRowType) {
 
   override def toString(): String = {

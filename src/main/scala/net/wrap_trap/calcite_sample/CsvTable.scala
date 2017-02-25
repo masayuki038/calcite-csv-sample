@@ -9,15 +9,15 @@ import org.apache.calcite.schema.impl.AbstractTable
 /**
   * Created by masayuki on 2017/02/17.
   */
-class CsvTable(val file: File, protoRowType: Option[RelProtoDataType]) extends AbstractTable {
+class CsvTable(val file: File, protoRowType: RelProtoDataType) extends AbstractTable {
 
   var fieldTypes: Option[List[CsvFieldType]] = None
 
   def getFieldTypes(): Option[List[CsvFieldType]] = fieldTypes
 
   def getRowType(typeFactory: RelDataTypeFactory): RelDataType = {
-    if (this.protoRowType.isDefined) {
-      return this.protoRowType.get.apply(typeFactory)
+    if (this.protoRowType != null) {
+      return this.protoRowType.apply(typeFactory)
     }
     if (fieldTypes.isEmpty) {
       this.fieldTypes = Option(List.empty[CsvFieldType])

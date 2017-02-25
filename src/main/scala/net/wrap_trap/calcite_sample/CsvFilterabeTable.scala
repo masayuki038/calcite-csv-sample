@@ -11,7 +11,7 @@ import org.apache.calcite.sql.SqlKind
 /**
   * Created by masayuki on 2017/02/21.
   */
-class CsvFilterableTable(val tFile: File, val tProtoRowType: Option[RelProtoDataType])
+class CsvFilterableTable(val tFile: File, val tProtoRowType: RelProtoDataType)
   extends CsvTable(tFile, tProtoRowType) {
 
   override def toString(): String = {

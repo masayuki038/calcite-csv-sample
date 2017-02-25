@@ -22,7 +22,7 @@ object CsvSchemaFactory {
 class CsvSchemaFactory extends SchemaFactory {
   override def create(parentSchema: SchemaPlus, name: String, operand: java.util.Map[String, Object]): Schema = {
     val directory = operand.get("directory").asInstanceOf[String]
-    val base = operand.get(ModelHandler.ExtraOperand.BASE_DIRECTORY.camelName).asInstanceOf[String]
+    val base = operand.get(ModelHandler.ExtraOperand.BASE_DIRECTORY.camelName).asInstanceOf[File]
     var directoryFile = new File(directory)
     if (base != null && !directoryFile.isAbsolute) {
       directoryFile = new File(base, directory)

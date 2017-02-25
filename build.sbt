@@ -17,5 +17,4 @@ libraryDependencies += "commons-io" % "commons-io" % "2.4"
 libraryDependencies += "org.hamcrest" % "hamcrest-core" % "1.4-atlassian-1"
 libraryDependencies += "sqlline" % "sqlline" % "1.2.0"
 
-
-
+retrieveManaged := true

@@ -14,7 +14,7 @@ import org.apache.calcite.schema.{SchemaPlus, Schemas}
 /**
   * Created by masayuki on 2017/02/21.
   */
-class CsvTranslatableTable(val tFile: File, val tProtoRowType: Option[RelProtoDataType])
+class CsvTranslatableTable(val tFile: File, val tProtoRowType: RelProtoDataType)
   extends CsvTable(tFile, tProtoRowType) {
 
   override def toString(): String = {
