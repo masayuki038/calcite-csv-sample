@@ -21,12 +21,12 @@ class CsvTranslatableTable(val tFile: File, val tProtoRowType: Option[RelProtoDa
     "CsvTranslatableTable"
   }
 
-  def project(root: DataContext, fields: Array[Int]): Enumerable[Any] = {
+  def project(root: DataContext, fields: Array[Int]): Enumerable[Array[Any]] = {
     val fieldTypes = getFieldTypes.get
 
     val cancelFlag = DataContext.Variable.CANCEL_FLAG.get(root)
-    new AbstractEnumerable[Any] {
-      override def enumerator(): Enumerator[Any] = {
+    new AbstractEnumerable[Array[Any]] {
+      override def enumerator(): Enumerator[Array[Any]] = {
         new CsvEnumerator(file, cancelFlag, fieldTypes, fields)
       }
     }

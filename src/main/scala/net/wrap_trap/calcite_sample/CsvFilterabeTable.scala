@@ -29,7 +29,7 @@ class CsvFilterableTable(val tFile: File, val tProtoRowType: Option[RelProtoData
     new AbstractEnumerable[Array[Any]] {
       override def enumerator(): Enumerator[Array[Any]] = {
         val fieldTypeList = getFieldTypes.get
-        new CsvEnumerator[Array[Any]](
+        new CsvEnumerator(
           file, cancelFlag, filterValues, new ArrayRowConverter(fieldTypeList.toArray, fields)
         )
       }

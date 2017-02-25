@@ -69,12 +69,8 @@ object CsvEnumerator {
     new CSVReader(reader)
   }
 
-  def converter(fieldTypes: Array[CsvFieldType], fields: Array[Int]): RowConverter[Any] = {
-    if (fields.length == 1) {
-      new SingleColumnRowConverter(fieldTypes(fields(0)), fields(0))
-    } else {
-      new ArrayRowConverter(fieldTypes, fields)
-    }
+  def converter(fieldTypes: Array[CsvFieldType], fields: Array[Int]): RowConverter[Array[Any]] = {
+    new ArrayRowConverter(fieldTypes, fields)
   }
 
   def identityList(n: Int): Array[Int] = {
@@ -82,19 +78,19 @@ object CsvEnumerator {
   }
 }
 
-class CsvEnumerator[T](val file: File,
+class CsvEnumerator(val file: File,
                        val cancelFlag: AtomicBoolean,
                        val filterValues: Array[String],
-                       val rowConverter: RowConverter[T]) extends Enumerator[T] {
+                       val rowConverter: RowConverter[Array[Any]]) extends Enumerator[Array[Any]] {
   var csvReader: CSVReader = CsvEnumerator.openCsv(file)
-  var currentPos: Option[T] = None
+  var currentPos: Option[Array[Any]] = None
   this.csvReader.readNext()
 
   def this(file: File, cancelFlag: AtomicBoolean, fieldTypes: List[CsvFieldType], fields: Array[Int]) = {
-    this(file, cancelFlag, null, CsvEnumerator.converter(fieldTypes.toArray, fields))
+    this(file, cancelFlag, Array.empty[String], CsvEnumerator.converter(fieldTypes.toArray, fields))
   }
 
-  override def current(): T = {
+  override def current(): Array[Any] = {
     currentPos.get
   }
 
@@ -245,11 +241,5 @@ class ArrayRowConverter(val fieldTypes: Array[CsvFieldType], val fields: Array[I
       i += 1
     })
     objects
-  }
-}
-
-class SingleColumnRowConverter(fieldType: CsvFieldType, fieldIndex: Int) extends RowConverter[Any] {
-  override def convertRow(strings: Array[String]): Any = {
-    convert(Option(fieldType), strings(fieldIndex))
   }
 }

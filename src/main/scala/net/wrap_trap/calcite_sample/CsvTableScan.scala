@@ -1,7 +1,7 @@
 package net.wrap_trap.calcite_sample
 
 import org.apache.calcite.adapter.enumerable.EnumerableRel.{Prefer, Result}
-import org.apache.calcite.adapter.enumerable.{EnumerableConvention, EnumerableRelImplementor, PhysTypeImpl}
+import org.apache.calcite.adapter.enumerable.{EnumerableConvention, EnumerableRel, EnumerableRelImplementor, PhysTypeImpl}
 import org.apache.calcite.linq4j.tree.{Blocks, Expression, Expressions, Primitive}
 import org.apache.calcite.plan.{RelOptCluster, RelOptPlanner, RelOptTable, RelTraitSet}
 import org.apache.calcite.rel.`type`.RelDataType
@@ -15,7 +15,7 @@ class CsvTableScan(val cluster: RelOptCluster,
                    val myTable: RelOptTable,
                    val csvTable: CsvTranslatableTable,
                    val fields: Array[Int])
-  extends TableScan(cluster, cluster.traitSetOf(EnumerableConvention.INSTANCE), myTable) with RelOptTable {
+  extends TableScan(cluster, cluster.traitSetOf(EnumerableConvention.INSTANCE), myTable) with EnumerableRel {
 
   override def copy(traitSet: RelTraitSet, inputs: java.util.List[RelNode]): RelNode = {
     new CsvTableScan(getCluster(), myTable, csvTable, fields)
