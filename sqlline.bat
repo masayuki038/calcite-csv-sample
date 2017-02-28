@@ -20,9 +20,6 @@
 :: > sqlline.bat
 :: sqlline> !connect jdbc:calcite:model=target/scala-2.12/classes/model.json admin admin
 
-:: Copy dependency jars on first call. (To force jar refresh, remove target\dependencies)
-if not exist target\dependencies (call mvn -B dependency:copy-dependencies -DoverWriteReleases=false -DoverWriteSnapshots=false -DoverWriteIfNewer=true -DoutputDirectory=target\dependencies)
-
-java -Xmx1G -cp ".\target\scala-2.12\classes;.\target\dependencies\*" sqlline.SqlLine --verbose=true %*
+sbt "run-main sqlline.SqlLine --verbose=true"
 
 :: End sqlline.bat

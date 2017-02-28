@@ -19,12 +19,14 @@ class CsvTable(val file: File, protoRowType: RelProtoDataType) extends AbstractT
     if (this.protoRowType != null) {
       return this.protoRowType.apply(typeFactory)
     }
-    if (fieldTypes.isEmpty) {
+    val (retFieldTypes: List[CsvFieldType], relDataType: RelDataType) = if (fieldTypes.isEmpty) {
       this.fieldTypes = Option(List.empty[CsvFieldType])
       CsvEnumerator.deduceRowType(typeFactory.asInstanceOf[JavaTypeFactory], file, fieldTypes)
     } else {
       CsvEnumerator.deduceRowType(typeFactory.asInstanceOf[JavaTypeFactory], file, None)
     }
+    this.fieldTypes = Option(retFieldTypes)
+    relDataType
   }
 }
 

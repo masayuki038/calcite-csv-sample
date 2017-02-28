@@ -18,7 +18,7 @@ class CsvFilterableTable(val tFile: File, val tProtoRowType: RelProtoDataType)
     "CsvFilterableTable"
   }
 
-  def scan(root: DataContext, filterCandidate: List[RexNode]): Enumerable[Array[Any]] = {
+  def scan(root: DataContext, filterCandidate: List[RexNode]): Enumerable[Array[Object]] = {
     val fields = CsvEnumerator.identityList(fieldTypes.size)
     val filterValues = new Array[String](fieldTypes.size)
 
@@ -26,8 +26,8 @@ class CsvFilterableTable(val tFile: File, val tProtoRowType: RelProtoDataType)
       filter => isFilterApplicable(filter).foreach(f => filterValues(f._1) = f._2.getValue2.toString))
 
     val cancelFlag = DataContext.Variable.CANCEL_FLAG.get(root)
-    new AbstractEnumerable[Array[Any]] {
-      override def enumerator(): Enumerator[Array[Any]] = {
+    new AbstractEnumerable[Array[Object]] {
+      override def enumerator(): Enumerator[Array[Object]] = {
         val fieldTypeList = getFieldTypes.get
         new CsvEnumerator(
           file, cancelFlag, filterValues, new ArrayRowConverter(fieldTypeList.toArray, fields)

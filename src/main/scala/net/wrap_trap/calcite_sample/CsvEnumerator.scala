@@ -21,7 +21,7 @@ object CsvEnumerator {
   val TIME_FORMAT_TIME = FastDateFormat.getInstance("HH:mm:ss", gmt)
   val TIME_FORMAT_TIMESTAMP = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss", gmt)
 
-  def deduceRowType(typeFactory: JavaTypeFactory, file: File, fieldTypes: Option[List[CsvFieldType]]): RelDataType = {
+  def deduceRowType(typeFactory: JavaTypeFactory, file: File, fieldTypes: Option[List[CsvFieldType]]): (List[CsvFieldType], RelDataType) = {
     var types = List.empty[RelDataType]
     var names = List.empty[String]
     var retFieldTypes = fieldTypes match {
@@ -58,7 +58,7 @@ object CsvEnumerator {
       names = "line" :: names
       types = typeFactory.createJavaType(classOf[String]) :: types
     }
-    typeFactory.createStructType(Pair.zip(names.toArray, types.toArray))
+    (retFieldTypes.reverse, typeFactory.createStructType(Pair.zip(names.reverse.toArray, types.reverse.toArray)))
   }
 
   private def openCsv(file: File): CSVReader = {
@@ -69,28 +69,28 @@ object CsvEnumerator {
     new CSVReader(reader)
   }
 
-  def converter(fieldTypes: Array[CsvFieldType], fields: Array[Int]): RowConverter[Array[Any]] = {
+  def converter(fieldTypes: Array[CsvFieldType], fields: Array[Int]): RowConverter[Array[Object]] = {
     new ArrayRowConverter(fieldTypes, fields)
   }
 
   def identityList(n: Int): Array[Int] = {
-    (0 to n).toArray
+    (0 to n-1).toArray
   }
 }
 
 class CsvEnumerator(val file: File,
                        val cancelFlag: AtomicBoolean,
                        val filterValues: Array[String],
-                       val rowConverter: RowConverter[Array[Any]]) extends Enumerator[Array[Any]] {
+                       val rowConverter: RowConverter[Array[Object]]) extends Enumerator[Array[Object]] {
   var csvReader: CSVReader = CsvEnumerator.openCsv(file)
-  var currentPos: Option[Array[Any]] = None
+  var currentPos: Option[Array[Object]] = None
   this.csvReader.readNext()
 
   def this(file: File, cancelFlag: AtomicBoolean, fieldTypes: List[CsvFieldType], fields: Array[Int]) = {
     this(file, cancelFlag, Array.empty[String], CsvEnumerator.converter(fieldTypes.toArray, fields))
   }
 
-  override def current(): Array[Any] = {
+  override def current(): Array[Object] = {
     currentPos.get
   }
 
@@ -105,7 +105,7 @@ class CsvEnumerator(val file: File,
         csvReader.close()
         return false
       }
-      if (this.filterValues.length > 0) {
+      if (this.filterValues != null && this.filterValues.length > 0) {
         strings.zipWithIndex.foreach { case (str: String, i: Int) => {
           if (str != this.filterValues(i)) {
             return moveNext()
@@ -130,112 +130,111 @@ class CsvEnumerator(val file: File,
 abstract class RowConverter[+E] {
   def convertRow(rows: Array[String]): E
 
-  def convert(fieldType: Option[CsvFieldType], string: String): Option[Any] = {
+  def convert(fieldType: Option[CsvFieldType], string: String): java.lang.Object = {
     fieldType match {
-      case None => Option(string)
+      case None => string
       case Some(BOOLEAN) => {
         if (string.length == 0) {
-          None
+          null
         } else {
-          Option(java.lang.Boolean.parseBoolean(string))
+          new java.lang.Boolean(java.lang.Boolean.parseBoolean(string))
         }
       }
       case Some(BYTE) => {
         if (string.length == 0) {
-          None
+          null
         } else {
-          Option(java.lang.Byte.parseByte(string))
+          new java.lang.Byte(java.lang.Byte.parseByte(string))
         }
       }
       case Some(CHAR) => {
         if (string.length == 0) {
-          None
+          null
         } else {
-          Option(string)
+          string
         }
       }
       case Some(SHORT) => {
         if (string.length == 0) {
-          None
+          null
         } else {
-          Option(java.lang.Short.parseShort(string))
+          new java.lang.Short(java.lang.Short.parseShort(string))
         }
       }
       case Some(INT) => {
         if (string.length == 0) {
-          None
+          null
         } else {
-          Option(java.lang.Integer.parseInt(string))
+          new java.lang.Integer(java.lang.Integer.parseInt(string))
         }
       }
       case Some(LONG) => {
         if (string.length == 0) {
-          None
+          null
         } else {
-          Option(java.lang.Long.parseLong(string))
+          new java.lang.Long(java.lang.Long.parseLong(string))
         }
       }
       case Some(FLOAT) => {
         if (string.length == 0) {
-          None
+          null
         } else {
-          Option(java.lang.Float.parseFloat(string))
+          new java.lang.Float(java.lang.Float.parseFloat(string))
         }
       }
       case Some(DOUBLE) => {
         if (string.length == 0) {
-          None
+          null
         } else {
-          Option(java.lang.Double.parseDouble(string))
+          new java.lang.Double(java.lang.Double.parseDouble(string))
         }
       }
       case Some(DATE) => {
         if (string.length == 0) {
-          None
+          null
         } else {
           try {
             val date = CsvEnumerator.TIME_FORMAT_DATE.parse(string)
-            Option(new java.sql.Date(date.getTime))
+            new java.sql.Date(date.getTime)
           } catch {
-            case _: Throwable => None
+            case _: Throwable => null
           }
         }
       }
       case Some(TIME) => {
         if (string.length == 0) {
-          None
+          null
         } else {
           try {
             val time = CsvEnumerator.TIME_FORMAT_TIME.parse(string)
-            Option(new java.sql.Time(time.getTime))
+            new java.sql.Time(time.getTime)
           } catch {
-            case _: Throwable => None
+            case _: Throwable => null
           }
         }
       }
       case Some(TIMESTAMP) => {
         if (string.length == 0) {
-          None
+          null
         } else {
           try {
             val timestamp = CsvEnumerator.TIME_FORMAT_TIMESTAMP.parse(string)
-            Option(new Timestamp(timestamp.getTime))
+            new Timestamp(timestamp.getTime)
           } catch {
-            case _: Throwable => None
+            case _: Throwable => null
           }
         }
       }
-      case Some(STRING) => Option(string)
+      case Some(STRING) => string
     }
   }
 }
 
-class ArrayRowConverter(val fieldTypes: Array[CsvFieldType], val fields: Array[Int]) extends RowConverter[Array[Any]] {
-  override def convertRow(strings: Array[String]): Array[Any] = {
-    val objects = new Array[Any](fields.length + 1)
+class ArrayRowConverter(val fieldTypes: Array[CsvFieldType], val fields: Array[Int])
+  extends RowConverter[Array[Object]] {
+  override def convertRow(strings: Array[String]): Array[Object] = {
+    val objects = new Array[Object](fields.length)
     var i = 0
-    objects(i) = System.currentTimeMillis
-    i += 1
     fields.foreach(field => {
       objects(i) = convert(Option(fieldTypes(field)), strings(field))
       i += 1
