@@ -1,6 +1,7 @@
 package net.wrap_trap.calcite_sample
 
 import java.io.File
+import java.util.concurrent.atomic.AtomicBoolean
 
 import org.apache.calcite.DataContext
 import org.apache.calcite.linq4j.{AbstractEnumerable, Enumerable, Enumerator}
@@ -25,7 +26,7 @@ class CsvFilterableTable(val tFile: File, val tProtoRowType: RelProtoDataType)
     filterCandidate.foreach(
       filter => isFilterApplicable(filter).foreach(f => filterValues(f._1) = f._2.getValue2.toString))
 
-    val cancelFlag = DataContext.Variable.CANCEL_FLAG.get(root)
+    val cancelFlag = DataContext.Variable.CANCEL_FLAG.get(root).asInstanceOf[AtomicBoolean]
     new AbstractEnumerable[Array[Object]] {
       override def enumerator(): Enumerator[Array[Object]] = {
         val fieldTypeList = getFieldTypes.get

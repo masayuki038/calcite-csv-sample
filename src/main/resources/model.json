@@ -25,7 +25,8 @@
       "type": "custom",
       "factory": "net.wrap_trap.calcite_sample.CsvSchemaFactory",
       "operand": {
-        "directory": "sales"
+        "directory": "sales",
+        "flavor": "translatable"
       }
     }
   ]
