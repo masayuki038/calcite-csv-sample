@@ -40,10 +40,9 @@ class CsvProjectTableScanRule
   def getProjectFields(exps: java.util.List[RexNode]): Array[Int] = {
     val fields = new Array[Int](exps.size)
     exps.zipWithIndex.foreach{ case (exp: RexNode, i: Int) => {
-      if (exp.isInstanceOf[RexInputRef]) {
-        fields(i) = exp.asInstanceOf[RexInputRef].getIndex
-      } else {
-        return null
+      exp match {
+        case e: RexInputRef => fields(i) = e.getIndex
+        case _ => return null
       }
     }}
     return fields
