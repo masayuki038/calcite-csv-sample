@@ -11,16 +11,16 @@ import org.apache.calcite.schema.impl.AbstractTable
   */
 class CsvTable(val file: File, protoRowType: RelProtoDataType) extends AbstractTable {
 
-  var fieldTypes: Option[List[CsvFieldType]] = None
+  var fieldTypes: Option[List[FieldType]] = None
 
-  def getFieldTypes(): Option[List[CsvFieldType]] = fieldTypes
+  def getFieldTypes(): Option[List[FieldType]] = fieldTypes
 
   def getRowType(typeFactory: RelDataTypeFactory): RelDataType = {
     if (this.protoRowType != null) {
       return this.protoRowType.apply(typeFactory)
     }
-    val (retFieldTypes: List[CsvFieldType], relDataType: RelDataType) = if (fieldTypes.isEmpty) {
-      this.fieldTypes = Option(List.empty[CsvFieldType])
+    val (retFieldTypes: List[FieldType], relDataType: RelDataType) = if (fieldTypes.isEmpty) {
+      this.fieldTypes = Option(List.empty[FieldType])
       CsvEnumerator.deduceRowType(typeFactory.asInstanceOf[JavaTypeFactory], file, fieldTypes)
     } else {
       CsvEnumerator.deduceRowType(typeFactory.asInstanceOf[JavaTypeFactory], file, None)

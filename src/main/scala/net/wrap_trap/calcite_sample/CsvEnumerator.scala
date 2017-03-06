@@ -21,12 +21,12 @@ object CsvEnumerator {
   val TIME_FORMAT_TIME = FastDateFormat.getInstance("HH:mm:ss", gmt)
   val TIME_FORMAT_TIMESTAMP = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss", gmt)
 
-  def deduceRowType(typeFactory: JavaTypeFactory, file: File, fieldTypes: Option[List[CsvFieldType]]): (List[CsvFieldType], RelDataType) = {
+  def deduceRowType(typeFactory: JavaTypeFactory, file: File, fieldTypes: Option[List[FieldType]]): (List[FieldType], RelDataType) = {
     var types = List.empty[RelDataType]
     var names = List.empty[String]
     var retFieldTypes = fieldTypes match {
       case Some(t) => t
-      case None => List.empty[CsvFieldType]
+      case None => List.empty[FieldType]
     }
 
     val reader = openCsv(file)
@@ -37,7 +37,7 @@ object CsvEnumerator {
         case true => {
           val name = string.substring(0, colon)
           val typeString = string.substring(colon + 1)
-          val fieldType = CsvFieldType.of(typeString)
+          val fieldType = FieldType.of(typeString)
           (name, fieldType)
         }
         case _ => {
@@ -47,7 +47,7 @@ object CsvEnumerator {
       val typ = fieldType match {
         case Some(f) => {
           retFieldTypes = f :: retFieldTypes
-          CsvFieldType.toType(f, typeFactory)
+          FieldType.toType(f, typeFactory)
         }
         case None => typeFactory.createJavaType(classOf[String])
       }
@@ -69,7 +69,7 @@ object CsvEnumerator {
     new CSVReader(reader)
   }
 
-  def converter(fieldTypes: Array[CsvFieldType], fields: Array[Int]): RowConverter[Array[Object]] = {
+  def converter(fieldTypes: Array[FieldType], fields: Array[Int]): RowConverter[Array[Object]] = {
     new ArrayRowConverter(fieldTypes, fields)
   }
 
@@ -86,7 +86,7 @@ class CsvEnumerator(val file: File,
   var currentPos: Option[Array[Object]] = None
   this.csvReader.readNext()
 
-  def this(file: File, cancelFlag: AtomicBoolean, fieldTypes: List[CsvFieldType], fields: Array[Int]) = {
+  def this(file: File, cancelFlag: AtomicBoolean, fieldTypes: List[FieldType], fields: Array[Int]) = {
     this(file, cancelFlag, Array.empty[String], CsvEnumerator.converter(fieldTypes.toArray, fields))
   }
 
@@ -130,7 +130,7 @@ class CsvEnumerator(val file: File,
 abstract class RowConverter[+E] {
   def convertRow(rows: Array[String]): E
 
-  def convert(fieldType: Option[CsvFieldType], string: String): java.lang.Object = {
+  def convert(fieldType: Option[FieldType], string: String): java.lang.Object = {
     fieldType match {
       case None => string
       case Some(BOOLEAN) => {
@@ -230,7 +230,7 @@ abstract class RowConverter[+E] {
   }
 }
 
-class ArrayRowConverter(val fieldTypes: Array[CsvFieldType], val fields: Array[Int])
+class ArrayRowConverter(val fieldTypes: Array[FieldType], val fields: Array[Int])
   extends RowConverter[Array[Object]] {
   override def convertRow(strings: Array[String]): Array[Object] = {
     val objects = new Array[Object](fields.length)

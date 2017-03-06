@@ -7,14 +7,14 @@ import org.apache.calcite.linq4j.tree.Primitive
 /**
   * Created by masayuki on 2017/02/18.
   */
-sealed abstract class CsvFieldType()
-case object CsvFieldType {
+sealed abstract class FieldType()
+case object FieldType {
   val map = List(
     ("string", STRING), ("boolean", BOOLEAN), ("byte", BYTE), ("char", CHAR), ("short", SHORT), ("int", INT),
     ("long", LONG), ("float", FLOAT), ("double", DOUBLE), ("date", DATE), ("time", TIME), ("timestamp", TIMESTAMP))
-    .toMap[String, CsvFieldType]
+    .toMap[String, FieldType]
 
-  def toType(csvFieldType: CsvFieldType, typeFactory: JavaTypeFactory): RelDataType = {
+  def toType(csvFieldType: FieldType, typeFactory: JavaTypeFactory): RelDataType = {
     val clazz = csvFieldType match {
       case STRING => classOf[String]
       case BOOLEAN => Primitive.BOOLEAN.boxClass
@@ -32,19 +32,19 @@ case object CsvFieldType {
     typeFactory.createJavaType(clazz)
   }
 
-  def of(typeString: String): Option[CsvFieldType] = {
+  def of(typeString: String): Option[FieldType] = {
     map.get(typeString)
   }
 }
-case object STRING extends CsvFieldType
-case object BOOLEAN extends CsvFieldType
-case object BYTE extends CsvFieldType
-case object CHAR extends CsvFieldType
-case object SHORT extends CsvFieldType
-case object INT extends CsvFieldType
-case object LONG extends CsvFieldType
-case object FLOAT extends CsvFieldType
-case object DOUBLE extends CsvFieldType
-case object DATE extends CsvFieldType
-case object TIME extends CsvFieldType
-case object TIMESTAMP extends CsvFieldType
+case object STRING extends FieldType
+case object BOOLEAN extends FieldType
+case object BYTE extends FieldType
+case object CHAR extends FieldType
+case object SHORT extends FieldType
+case object INT extends FieldType
+case object LONG extends FieldType
+case object FLOAT extends FieldType
+case object DOUBLE extends FieldType
+case object DATE extends FieldType
+case object TIME extends FieldType
+case object TIMESTAMP extends FieldType
