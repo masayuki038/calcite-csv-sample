@@ -45,7 +45,7 @@ class CsvTranslatableTable(val tFile: File, val tProtoRowType: RelProtoDataType)
 
   def toRel(context: RelOptTable.ToRelContext, relOptTable: RelOptTable): RelNode = {
     val fieldCount = relOptTable.getRowType.getFieldCount
-    val fields = CsvEnumerator.identityList(fieldCount)
+    val fields = EnumeratorUtils.identityList(fieldCount)
     new CsvTableScan(context.getCluster, relOptTable, this, fields)
   }
 }

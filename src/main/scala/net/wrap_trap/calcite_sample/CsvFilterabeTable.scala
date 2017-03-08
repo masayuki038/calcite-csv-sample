@@ -20,7 +20,7 @@ class CsvFilterableTable(val tFile: File, val tProtoRowType: RelProtoDataType)
   }
 
   def scan(root: DataContext, filterCandidate: List[RexNode]): Enumerable[Array[Object]] = {
-    val fields = CsvEnumerator.identityList(fieldTypes.size)
+    val fields = EnumeratorUtils.identityList(fieldTypes.size)
     val filterValues = new Array[String](fieldTypes.size)
 
     filterCandidate.foreach(

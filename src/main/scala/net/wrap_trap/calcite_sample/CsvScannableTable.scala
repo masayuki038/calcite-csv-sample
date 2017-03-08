@@ -21,7 +21,7 @@ class CsvScannableTable(val tFile: File, val tProtoRowType: RelProtoDataType)
 
   override def scan(root: DataContext): Enumerable[Array[Object]] = {
     val fieldTypes = getFieldTypes.get
-    val fields = CsvEnumerator.identityList(fieldTypes.size)
+    val fields = EnumeratorUtils.identityList(fieldTypes.size)
     val cancelFlag = DataContext.Variable.CANCEL_FLAG.get(root).asInstanceOf[AtomicBoolean]
     new AbstractEnumerable[Array[Object]] {
       override def enumerator(): Enumerator[Array[Object]] = {

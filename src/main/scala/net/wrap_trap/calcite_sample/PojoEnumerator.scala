@@ -10,7 +10,7 @@ import org.apache.commons.lang3.time.FastDateFormat
 /**
   * Created by masayuki on 2017/03/06.
   */
-class PojoEnumerator {
+object PojoEnumerator {
   val gmt = TimeZone.getTimeZone("GMT")
   val TIME_FORMAT_DATE = FastDateFormat.getInstance("yyyy-MM-dd", gmt)
   val TIME_FORMAT_TIME = FastDateFormat.getInstance("HH:mm:ss", gmt)

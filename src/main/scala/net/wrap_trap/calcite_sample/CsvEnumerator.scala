@@ -15,6 +15,16 @@ import org.apache.calcite.util.Pair
 /**
   * Created by masayuki on 2017/02/18.
   */
+object EnumeratorUtils {
+  def converter(fieldTypes: Array[FieldType], fields: Array[Int]): RowConverter[Array[Object]] = {
+    new ArrayRowConverter(fieldTypes, fields)
+  }
+
+  def identityList(n: Int): Array[Int] = {
+    (0 to n-1).toArray
+  }
+}
+
 object CsvEnumerator {
   val gmt = TimeZone.getTimeZone("GMT")
   val TIME_FORMAT_DATE = FastDateFormat.getInstance("yyyy-MM-dd", gmt)
@@ -68,14 +78,6 @@ object CsvEnumerator {
     }
     new CSVReader(reader)
   }
-
-  def converter(fieldTypes: Array[FieldType], fields: Array[Int]): RowConverter[Array[Object]] = {
-    new ArrayRowConverter(fieldTypes, fields)
-  }
-
-  def identityList(n: Int): Array[Int] = {
-    (0 to n-1).toArray
-  }
 }
 
 class CsvEnumerator(val file: File,
@@ -87,7 +89,7 @@ class CsvEnumerator(val file: File,
   this.csvReader.readNext()
 
   def this(file: File, cancelFlag: AtomicBoolean, fieldTypes: List[FieldType], fields: Array[Int]) = {
-    this(file, cancelFlag, Array.empty[String], CsvEnumerator.converter(fieldTypes.toArray, fields))
+    this(file, cancelFlag, Array.empty[String], EnumeratorUtils.converter(fieldTypes.toArray, fields))
   }
 
   override def current(): Array[Object] = {
