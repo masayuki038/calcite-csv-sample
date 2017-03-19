@@ -19,8 +19,7 @@ object PojoEnumerator {
   val TIME_FORMAT_TIME = FastDateFormat.getInstance("HH:mm:ss", gmt)
   val TIME_FORMAT_TIMESTAMP = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss", gmt)
 
-  def deduceRowType(typeFactory: JavaTypeFactory): (List[FieldType], RelDataType) = {
-    var retFieldTypes = List.empty[FieldType]
+  def deduceRowType(typeFactory: JavaTypeFactory): RelDataType = {
     var names = List.empty[String]
     var relDataTypes = List.empty[RelDataType]
 
@@ -28,21 +27,16 @@ object PojoEnumerator {
       val relDataType = FieldType.toType(fieldType, typeFactory)
       names = name :: names
       relDataTypes = relDataType :: relDataTypes
-      retFieldTypes = fieldType :: retFieldTypes
     }}
 
-    (retFieldTypes.reverse, typeFactory.createStructType(Pair.zip(names.reverse.toArray, relDataTypes.reverse.toArray)))
+    typeFactory.createStructType(Pair.zip(names.reverse.toArray, relDataTypes.reverse.toArray))
   }
 }
 
 class PojoEnumerator(val map: scala.collection.mutable.Map[String, Object],
-                     val rowConverter: RowConverter[Object, Array[Object]]) extends Enumerator[Array[Object]] {
+                     val fields: Array[Int]) extends Enumerator[Array[Object]] {
   val iterator = map.iterator
   var currentPos: Option[Array[Object]] = None
-
-//  def this(map: scala.collection.mutable.Map[String, Object], fieldTypes: List[FieldType], fields: Array[Int]) = {
-//    this(map, EnumeratorUtils.converter(fieldTypes.toArray, fields))
-//  }
 
   override def current(): Array[Object] = {
     currentPos.get
@@ -54,7 +48,7 @@ class PojoEnumerator(val map: scala.collection.mutable.Map[String, Object],
       return false
     }
     val (_, pojo) = iterator.next
-    this.currentPos = Option(this.rowConverter.convertRow(pojo))
+    this.currentPos = Option(convertRow(pojo))
     return true
   }
 
@@ -63,23 +57,16 @@ class PojoEnumerator(val map: scala.collection.mutable.Map[String, Object],
   }
 
   override def close(): Unit = {}
-}
 
-class PojoRowConverter(val fieldTypes: Array[FieldType], val fields: Array[Int])
-  extends RowConverter[Object, Array[Object]] {
-  override def convertRow(pojo: Object): Array[Object] = {
+  def convertRow(pojo: Object): Array[Object] = {
     val objects = new Array[Object](fields.length)
     var i = 0
     fields.foreach(field => {
       val property = classOf[Emp].getDeclaredField(Emp.FIELD_TYPES(field)._2)
       property.setAccessible(true)
-      objects(i) = convert(Option(fieldTypes(field)), property.get(pojo))
+      objects(i) = property.get(pojo)
       i += 1
     })
     objects
-  }
-
-  override def convert(fieldType: Option[FieldType], value: Object): java.lang.Object = {
-    value
   }
 }
