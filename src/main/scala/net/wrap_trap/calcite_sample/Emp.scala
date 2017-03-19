@@ -7,17 +7,17 @@ import org.apache.calcite.rel.`type`.RelDataType
   */
 
 case object Emp {
-  val FIELD_TYPES: Array[(String, FieldType)] = Array(
-    ("EMPNO", INT),
-    ("NAME", STRING),
-    ("DEPTNO", INT),
-    ("GENDER", STRING),
-    ("CITY", STRING),
-    ("EMPID", INT),
-    ("AGE", INT),
-    ("SLACKER", BOOLEAN),
-    ("MANAGER", BOOLEAN),
-    ("JOINDATE", DATE))
+  val FIELD_TYPES: Array[(String, String, FieldType)] = Array(
+    ("EMPNO", "empNo", INT),
+    ("NAME", "name", STRING),
+    ("DEPTNO", "deptNo", INT),
+    ("GENDER", "gender", STRING),
+    ("CITY", "city", STRING),
+    ("EMPID", "empId", INT),
+    ("AGE", "age", INT),
+    ("SLACKER", "slacker", BOOLEAN),
+    ("MANAGER", "manager", BOOLEAN),
+    ("JOINDATE", "joinDate", DATE))
 }
 
 

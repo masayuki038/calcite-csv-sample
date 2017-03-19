@@ -1,5 +1,6 @@
 package net.wrap_trap.calcite_sample
 
+import org.apache.calcite.adapter.java.JavaTypeFactory
 import org.apache.calcite.rel.`type`.{RelDataType, RelDataTypeFactory, RelProtoDataType}
 import org.apache.calcite.schema.impl.AbstractTable
 
@@ -16,12 +17,8 @@ class PojoTable(protoRowType: RelProtoDataType) extends AbstractTable {
     if (this.protoRowType != null) {
       return this.protoRowType.apply(typeFactory)
     }
-    val (retFieldTypes: List[FieldType], relDataType: RelDataType) = if (fieldTypes.isEmpty) {
-      this.fieldTypes = Option(List.empty[FieldType])
-
-    } else {
-
-    }
+    val (retFieldTypes: List[FieldType], relDataType: RelDataType) =
+      PojoEnumerator.deduceRowType(typeFactory.asInstanceOf[JavaTypeFactory])
     this.fieldTypes = Option(retFieldTypes)
     relDataType
   }

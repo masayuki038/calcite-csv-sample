@@ -16,5 +16,6 @@ libraryDependencies += "org.apache.commons" % "commons-lang3" % "3.5"
 libraryDependencies += "commons-io" % "commons-io" % "2.4"
 libraryDependencies += "org.hamcrest" % "hamcrest-core" % "1.4-atlassian-1"
 libraryDependencies += "sqlline" % "sqlline" % "1.2.0"
+libraryDependencies += "commons-beanutils" % "commons-beanutils" % "1.9.3"
 
 retrieveManaged := true

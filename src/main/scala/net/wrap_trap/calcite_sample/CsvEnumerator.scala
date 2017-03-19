@@ -16,7 +16,7 @@ import org.apache.calcite.util.Pair
   * Created by masayuki on 2017/02/18.
   */
 object EnumeratorUtils {
-  def converter(fieldTypes: Array[FieldType], fields: Array[Int]): RowConverter[Array[Object]] = {
+  def converter(fieldTypes: Array[FieldType], fields: Array[Int]): RowConverter[Array[String], Array[Object]] = {
     new ArrayRowConverter(fieldTypes, fields)
   }
 
@@ -83,7 +83,7 @@ object CsvEnumerator {
 class CsvEnumerator(val file: File,
                        val cancelFlag: AtomicBoolean,
                        val filterValues: Array[String],
-                       val rowConverter: RowConverter[Array[Object]]) extends Enumerator[Array[Object]] {
+                       val rowConverter: RowConverter[Array[String], Array[Object]]) extends Enumerator[Array[Object]] {
   var csvReader: CSVReader = CsvEnumerator.openCsv(file)
   var currentPos: Option[Array[Object]] = None
   this.csvReader.readNext()
@@ -129,10 +129,28 @@ class CsvEnumerator(val file: File,
   }
 }
 
-abstract class RowConverter[+E] {
-  def convertRow(rows: Array[String]): E
+abstract class RowConverter[T,+E] {
+  def convertRow(target: T): E
+  def convert(fieldType: Option[FieldType], value: Object): java.lang.Object
+}
 
-  def convert(fieldType: Option[FieldType], string: String): java.lang.Object = {
+class ArrayRowConverter(val fieldTypes: Array[FieldType], val fields: Array[Int])
+  extends RowConverter[Array[String], Array[Object]] {
+  override def convertRow(fieldValues: Array[String]): Array[Object] = {
+    val objects = new Array[Object](fields.length)
+    var i = 0
+    fields.foreach(field => {
+      objects(i) = convert(Option(fieldTypes(field)), fieldValues(field))
+      i += 1
+    })
+    objects
+  }
+
+  override def convert(fieldType: Option[FieldType], value: Object): java.lang.Object = {
+    if(!value.isInstanceOf[String]) {
+      throw new IllegalArgumentException("Unexpected value type: " + value.getClass.getName)
+    }
+    val string = value.asInstanceOf[String]
     fieldType match {
       case None => string
       case Some(BOOLEAN) => {
@@ -229,18 +247,5 @@ abstract class RowConverter[+E] {
       }
       case Some(STRING) => string
     }
-  }
-}
-
-class ArrayRowConverter(val fieldTypes: Array[FieldType], val fields: Array[Int])
-  extends RowConverter[Array[Object]] {
-  override def convertRow(strings: Array[String]): Array[Object] = {
-    val objects = new Array[Object](fields.length)
-    var i = 0
-    fields.foreach(field => {
-      objects(i) = convert(Option(fieldTypes(field)), strings(field))
-      i += 1
-    })
-    objects
   }
 }
