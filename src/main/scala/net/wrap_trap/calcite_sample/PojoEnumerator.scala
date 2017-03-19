@@ -49,12 +49,12 @@ class PojoEnumerator(val map: scala.collection.mutable.Map[String, Object],
   }
 
   override def moveNext(): Boolean = {
-    val next = iterator.next()
-    if(next == null)  {
+    if(!iterator.hasNext)  {
       this.currentPos = None
       return false
     }
-    this.currentPos = Option(this.rowConverter.convertRow(next))
+    val (_, pojo) = iterator.next
+    this.currentPos = Option(this.rowConverter.convertRow(pojo))
     return true
   }
 
@@ -71,7 +71,9 @@ class PojoRowConverter(val fieldTypes: Array[FieldType], val fields: Array[Int])
     val objects = new Array[Object](fields.length)
     var i = 0
     fields.foreach(field => {
-      objects(i) = convert(Option(fieldTypes(field)), BeanUtils.getProperty(pojo, Emp.FIELD_TYPES(field)._2))
+      val property = classOf[Emp].getDeclaredField(Emp.FIELD_TYPES(field)._2)
+      property.setAccessible(true)
+      objects(i) = convert(Option(fieldTypes(field)), property.get(pojo))
       i += 1
     })
     objects

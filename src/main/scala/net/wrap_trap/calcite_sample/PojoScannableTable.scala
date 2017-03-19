@@ -19,10 +19,10 @@ class PojoScannableTable(val tProtoRowType: RelProtoDataType)
   def createEmpMap(): scala.collection.mutable.Map[String, Object] = {
     val map  = scala.collection.mutable.Map.empty[String, Object]
     map.put("1", Emp(1, "emp1", 1, "M", "city1", 1, 30, false, false, new java.sql.Date(System.currentTimeMillis)))
-    map.put("2", Emp(1, "emp2", 2, "M", "city1", 2, 30, false, false, new java.sql.Date(System.currentTimeMillis)))
-    map.put("3", Emp(1, "emp3", 3, "M", "city1", 3, 30, false, false, new java.sql.Date(System.currentTimeMillis)))
-    map.put("4", Emp(1, "emp4", 4, "M", "city1", 4, 30, false, false, new java.sql.Date(System.currentTimeMillis)))
-    map.put("5", Emp(1, "emp5", 5, "M", "city1", 5, 30, false, false, new java.sql.Date(System.currentTimeMillis)))
+    map.put("2", Emp(1, "emp2", 2, "M", "city1", 2, 40, false, false, new java.sql.Date(System.currentTimeMillis)))
+    map.put("3", Emp(1, "emp3", 3, "F", "city1", 3, 50, false, false, new java.sql.Date(System.currentTimeMillis)))
+    map.put("4", Emp(1, "emp4", 2, "F", "city1", 4, 60, false, false, new java.sql.Date(System.currentTimeMillis)))
+    map.put("5", Emp(1, "emp5", 1, "M", "city1", 5, 70, false, false, new java.sql.Date(System.currentTimeMillis)))
     map
   }
 

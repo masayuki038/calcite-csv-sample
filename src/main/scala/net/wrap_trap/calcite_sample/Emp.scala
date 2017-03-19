@@ -21,5 +21,5 @@ case object Emp {
 }
 
 
-case class Emp(empNo: Int, name: String, deptNo: Int, gender: String, city: String, emptId: Int, age: Int,
+case class Emp(empNo: Int, name: String, deptNo: Int, gender: String, city: String, empId: Int, age: Int,
                slacker: Boolean, manager: Boolean, joinDate: java.sql.Date) {}
