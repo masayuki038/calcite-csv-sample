@@ -20,13 +20,21 @@ object PojoScannableTable {
     map.put("5", Emp(1, "emp5", 1, "M", "city1", 5, 70, false, false, new java.sql.Date(System.currentTimeMillis)))
     map
   }
+
+  def createDeptMap(): scala.collection.mutable.Map[String, Object] = {
+    val map  = scala.collection.mutable.Map.empty[String, Object]
+    map.put("1", Dept(1, "emp1", 1, new java.sql.Date(System.currentTimeMillis)))
+    map.put("2", Dept(2, "emp1", 2, new java.sql.Date(System.currentTimeMillis)))
+    map.put("3", Dept(3, "emp1", 3, new java.sql.Date(System.currentTimeMillis)))
+    map.put("4", Dept(4, "emp1", 4, new java.sql.Date(System.currentTimeMillis)))
+    map.put("5", Dept(5, "emp1", 5, new java.sql.Date(System.currentTimeMillis)))
+    map
+  }
 }
 
 
-class PojoScannableTable(val tProtoRowType: RelProtoDataType)
+class PojoScannableTable(val o: Any, val tProtoRowType: RelProtoDataType)
   extends AbstractTable with ScannableTable {
-
-  val empMap = PojoScannableTable.createEmpMap
 
   override def toString(): String = {
     "PojoScannableTable"
@@ -36,14 +44,24 @@ class PojoScannableTable(val tProtoRowType: RelProtoDataType)
     if (this.tProtoRowType != null) {
       return this.tProtoRowType.apply(typeFactory)
     }
-    PojoEnumerator.deduceRowType(typeFactory.asInstanceOf[JavaTypeFactory])
+    PojoEnumerator.deduceRowType(this.o, typeFactory.asInstanceOf[JavaTypeFactory])
   }
 
   override def scan(root: DataContext): Enumerable[Array[Object]] = {
-    val fields = EnumeratorUtils.identityList(Emp.FIELD_TYPES.size)
-    new AbstractEnumerable[Array[Object]] {
-      override def enumerator(): Enumerator[Array[Object]] = {
-        new PojoEnumerator(empMap, fields)
+    o match {
+      case _: Emp => {
+        new AbstractEnumerable[Array[Object]] {
+          override def enumerator(): Enumerator[Array[Object]] = {
+            new PojoEnumerator(PojoScannableTable.createEmpMap, EnumeratorUtils.identityList(Emp.FIELD_TYPES.size))
+          }
+        }
+      }
+      case _: Dept => {
+        new AbstractEnumerable[Array[Object]] {
+          override def enumerator(): Enumerator[Array[Object]] = {
+            new PojoEnumerator(PojoScannableTable.createDeptMap, EnumeratorUtils.identityList(Dept.FIELD_TYPES.size))
+          }
+        }
       }
     }
   }

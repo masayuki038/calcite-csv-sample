@@ -10,7 +10,8 @@ class PojoSchema extends AbstractSchema {
 
   override def getTableMap(): java.util.Map[String, Table] = {
     val map = new java.util.HashMap[String, Table]
-    map.put("EMP", new PojoScannableTable(null))
+    map.put("EMP", new PojoScannableTable(Emp, null))
+    map.put("DEPT", new PojoScannableTable(Dept, null))
     map
   }
 }
