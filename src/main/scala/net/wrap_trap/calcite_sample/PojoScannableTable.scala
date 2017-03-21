@@ -23,11 +23,11 @@ object PojoScannableTable {
 
   def createDeptMap(): scala.collection.mutable.Map[String, Object] = {
     val map  = scala.collection.mutable.Map.empty[String, Object]
-    map.put("1", Dept(1, "emp1", 1, new java.sql.Date(System.currentTimeMillis)))
-    map.put("2", Dept(2, "emp1", 2, new java.sql.Date(System.currentTimeMillis)))
-    map.put("3", Dept(3, "emp1", 3, new java.sql.Date(System.currentTimeMillis)))
-    map.put("4", Dept(4, "emp1", 4, new java.sql.Date(System.currentTimeMillis)))
-    map.put("5", Dept(5, "emp1", 5, new java.sql.Date(System.currentTimeMillis)))
+    map.put("1", Dept(1, "dept1", 1, new java.sql.Date(System.currentTimeMillis)))
+    map.put("2", Dept(2, "dept2", 2, new java.sql.Date(System.currentTimeMillis)))
+    map.put("3", Dept(3, "dept3", 3, new java.sql.Date(System.currentTimeMillis)))
+    map.put("4", Dept(4, "dept4", 4, new java.sql.Date(System.currentTimeMillis)))
+    map.put("5", Dept(5, "dept5", 5, new java.sql.Date(System.currentTimeMillis)))
     map
   }
 }
@@ -49,14 +49,14 @@ class PojoScannableTable(val o: Any, val tProtoRowType: RelProtoDataType)
 
   override def scan(root: DataContext): Enumerable[Array[Object]] = {
     o match {
-      case _: Emp => {
+      case Emp => {
         new AbstractEnumerable[Array[Object]] {
           override def enumerator(): Enumerator[Array[Object]] = {
             new PojoEnumerator(PojoScannableTable.createEmpMap, EnumeratorUtils.identityList(Emp.FIELD_TYPES.size))
           }
         }
       }
-      case _: Dept => {
+      case Dept => {
         new AbstractEnumerable[Array[Object]] {
           override def enumerator(): Enumerator[Array[Object]] = {
             new PojoEnumerator(PojoScannableTable.createDeptMap, EnumeratorUtils.identityList(Dept.FIELD_TYPES.size))

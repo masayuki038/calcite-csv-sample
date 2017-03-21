@@ -2,12 +2,10 @@ package net.wrap_trap.calcite_sample
 
 import java.util.TimeZone
 
-import com.fasterxml.jackson.databind.util.BeanUtil
 import org.apache.calcite.adapter.java.JavaTypeFactory
 import org.apache.calcite.linq4j.Enumerator
 import org.apache.calcite.rel.`type`.RelDataType
 import org.apache.calcite.util.Pair
-import org.apache.commons.beanutils.BeanUtils
 import org.apache.commons.lang3.time.FastDateFormat
 
 /**
@@ -83,7 +81,7 @@ class PojoEnumerator(val map: scala.collection.mutable.Map[String, Object],
       }
       case _: Dept => {
         fields.foreach(field => {
-          val property = classOf[Emp].getDeclaredField(Dept.FIELD_TYPES(field)._2)
+          val property = classOf[Dept].getDeclaredField(Dept.FIELD_TYPES(field)._2)
           property.setAccessible(true)
           objects(i) = property.get(pojo)
           i += 1
