@@ -32,7 +32,6 @@ object PojoScannableTable {
   }
 }
 
-
 class PojoScannableTable(val o: Any, val tProtoRowType: RelProtoDataType)
   extends AbstractTable with ScannableTable {
 
@@ -48,20 +47,13 @@ class PojoScannableTable(val o: Any, val tProtoRowType: RelProtoDataType)
   }
 
   override def scan(root: DataContext): Enumerable[Array[Object]] = {
-    o match {
-      case Emp => {
-        new AbstractEnumerable[Array[Object]] {
-          override def enumerator(): Enumerator[Array[Object]] = {
-            new PojoEnumerator(PojoScannableTable.createEmpMap, EnumeratorUtils.identityList(Emp.FIELD_TYPES.size))
-          }
-        }
-      }
-      case Dept => {
-        new AbstractEnumerable[Array[Object]] {
-          override def enumerator(): Enumerator[Array[Object]] = {
-            new PojoEnumerator(PojoScannableTable.createDeptMap, EnumeratorUtils.identityList(Dept.FIELD_TYPES.size))
-          }
-        }
+    val (map: scala.collection.mutable.Map[String, Object], size) = o match {
+      case Emp => (PojoScannableTable.createEmpMap, EnumeratorUtils.identityList(Emp.FIELD_TYPES.size))
+      case Dept => (PojoScannableTable.createDeptMap, EnumeratorUtils.identityList(Dept.FIELD_TYPES.size))
+    }
+    new AbstractEnumerable[Array[Object]] {
+      override def enumerator(): Enumerator[Array[Object]] = {
+        new PojoEnumerator(map, size)
       }
     }
   }

@@ -21,22 +21,16 @@ object PojoEnumerator {
     var names = List.empty[String]
     var relDataTypes = List.empty[RelDataType]
 
-    o match {
-      case Emp => {
-        Emp.FIELD_TYPES.foreach{case (name: String, _, fieldType: FieldType) => {
-        val relDataType = FieldType.toType(fieldType, typeFactory)
-        names = name :: names
-        relDataTypes = relDataType :: relDataTypes
-        }}
-      }
-      case Dept => {
-        Dept.FIELD_TYPES.foreach{case (name: String, _, fieldType: FieldType) => {
-          val relDataType = FieldType.toType(fieldType, typeFactory)
-          names = name :: names
-          relDataTypes = relDataType :: relDataTypes
-        }}
-      }
+    val fieldTypes = o match {
+      case Emp => Emp.FIELD_TYPES
+      case Dept => Dept.FIELD_TYPES
     }
+
+    fieldTypes.foreach{case (name: String, _, fieldType: FieldType) => {
+      val relDataType = FieldType.toType(fieldType, typeFactory)
+      names = name :: names
+      relDataTypes = relDataType :: relDataTypes
+    }}
 
     typeFactory.createStructType(Pair.zip(names.reverse.toArray, relDataTypes.reverse.toArray))
   }
@@ -70,24 +64,15 @@ class PojoEnumerator(val map: scala.collection.mutable.Map[String, Object],
   def convertRow(pojo: Object): Array[Object] = {
     val objects = new Array[Object](fields.length)
     var i = 0
-    pojo match {
-      case _: Emp => {
-        fields.foreach(field => {
-          val property = classOf[Emp].getDeclaredField(Emp.FIELD_TYPES(field)._2)
-          property.setAccessible(true)
-          objects(i) = property.get(pojo)
-          i += 1
-        })
+    fields.foreach(field => {
+      val property = pojo match {
+        case _: Emp => classOf[Emp].getDeclaredField(Emp.FIELD_TYPES(field)._2)
+        case _: Dept => classOf[Dept].getDeclaredField(Dept.FIELD_TYPES(field)._2)
       }
-      case _: Dept => {
-        fields.foreach(field => {
-          val property = classOf[Dept].getDeclaredField(Dept.FIELD_TYPES(field)._2)
-          property.setAccessible(true)
-          objects(i) = property.get(pojo)
-          i += 1
-        })
-      }
-    }
+      property.setAccessible(true)
+      objects(i) = property.get(pojo)
+      i += 1
+    })
     objects
   }
 }
